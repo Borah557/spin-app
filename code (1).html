@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Spin King INR (Combined)</title>
+    <style>
+        /* --- START EMBEDDED CSS --- */
+
+        /* --- Basic Reset & Setup --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6; /* Light background */
+            color: #333;
+            height: 100%;
+            overscroll-behavior: none; /* Prevent pull-to-refresh */
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* --- Screen Management --- */
+        .screen {
+            display: none; /* Hidden by default */
+            min-height: 100vh; /* Full height */
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .screen.active {
+            display: block; /* Show active screen */
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px; /* Rounded buttons */
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin: 5px;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            color: #666; /* Ensure disabled text is visible */
+        }
+
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: #0056b3; }
+
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover:not(:disabled) { background-color: #1e7e34; }
+
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover:not(:disabled) { background-color: #545b62; }
+
+        .btn-deposit { background-color: #ffc107; color: #333; }
+        .btn-deposit:hover:not(:disabled) { background-color: #e0a800; }
+
+        .btn-spin { background-color: #dc3545; color: white; font-size: 1.2em; padding: 15px 35px; }
+        .btn-spin:hover:not(:disabled) { background-color: #c82333; }
+
+        .btn-full { width: 100%; margin-top: 15px; }
+        .btn-back { background: none; border: 1px solid #ccc; color: #555; padding: 5px 10px; font-size: 0.9em; margin-bottom: 15px; }
+
+        /* --- Forms --- */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .input-group input[type="tel"],
+        .input-group input[type="text"],
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        /* --- Login Screen --- */
+        #login-screen {
+            text-align: center;
+            padding-top: 50px;
+        }
+        #login-screen h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        /* --- OTP Popup --- */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .popup:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+        }
+        .popup-content h2 { margin-bottom: 15px; }
+        .popup-content p { margin-bottom: 10px; }
+        .popup .button-group { margin-top: 20px; }
+        .simulated-otp { font-size: 0.9em; color: #666; }
+        .simulated-otp strong { color: #dc3545; }
+
+        /* --- Main App Screen --- */
+        .app-header {
+            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%); /* Vibrant gradient */
+            color: white;
+            padding-bottom: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .fake-withdrawals {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 5px 0;
+            font-size: 0.85em;
+            overflow: hidden;
+            white-space: nowrap;
+            height: 25px; /* Fixed height */
+        }
+        /* Ticker Animation */
+        .ticker-wrap { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+        .ticker-move { display: inline-block; }
+        .ticker-move span { padding: 0 20px; }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .wallet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+        .balance-label { font-size: 0.9em; opacity: 0.8; }
+        .balance-amount { font-size: 1.4em; font-weight: bold; }
+
+        .app-main {
+            text-align: center;
+            padding: 30px 15px;
+        }
+        .app-main h2 { margin-bottom: 30px; color: #333; }
+
+        /* --- Spinning Wheel --- */
+        .wheel-container {
+            position: relative;
+            width: 280px; /* Adjust size */
+            height: 280px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -10px; /* Position above the wheel */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #e74c3c; /* Pointer color */
+            z-index: 10;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient( /* Example segments - replace with image or more complex CSS/JS */
+                #3498db 0deg 45deg, #f1c40f 45deg 90deg,
+                #e74c3c 90deg 135deg, #9b59b6 135deg 180deg,
+                #2ecc71 180deg 225deg, #1abc9c 225deg 270deg,
+                #e67e22 270deg 315deg, #bdc3c7 315deg 360deg
+            );
+            border: 5px solid #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1); /* Spin animation */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wheel-inner {
+            width: 80px;
+            height: 80px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #333;
+            z-index: 5;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            border: 3px solid #eee;
+        }
+
+        /* Spin Animation Class */
+        .wheel.spinning {
+            /* JS will handle the specific rotation */
+        }
+
+        .spin-result-display {
+            margin-top: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 30px;
+            color: #28a745; /* Default to success color */
+        }
+        .spin-result-display.loss {
+            color: #dc3545; /* Red for loss */
+        }
+
+        .spin-outcomes {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* --- Deposit Screen --- */
+        #deposit-screen {
+            padding-top: 30px;
+        }
+        #deposit-screen h2 { margin-bottom: 25px; text-align: center; }
+        .simulated-payment-notice {
+            margin-top: 20px;
+            font-size: 0.85em;
+            color: #555;
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ffeeba;
+            text-align: center;
+        }
+
+        /* --- Footer --- */
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        /* --- Loading Indicator --- */
+        #loading {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background: rgba(255,255,255,0.9); /* Slightly opaque white */
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             z-index: 9999;
+             font-size: 1.5em;
+             color: #333;
+             font-weight: bold;
+         }
+        #loading.hidden {
+            display: none;
+        }
+
+        /* --- END EMBEDDED CSS --- */
+    </style>
+</head>
+<body>
+
+    <div id="loading">Loading...</div>
+
+    <!-- Login Screen (Initially Visible) -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1>Spin King</h1>
+            <p>Login with Mobile Number</p>
+            <div class="input-group">
+                <label for="mobile">Mobile Number (+91):</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter 10 digit number" maxlength="10" inputmode="numeric">
+            </div>
+            <button id="send-otp-btn" class="btn btn-primary">Send OTP</button>
+
+            <!-- OTP Popup (Initially Hidden) -->
+            <div id="otp-popup" class="popup hidden">
+                <div class="popup-content">
+                    <h2>Enter OTP</h2>
+                    <p>OTP Sent to <span id="otp-mobile-display"></span></p>
+                    <p class="simulated-otp">(Simulated OTP: <strong id="simulated-otp-value">123456</strong>)</p>
+                    <div class="input-group">
+                        <label for="otp">OTP:</label>
+                        <input type="text" id="otp" name="otp" placeholder="Enter 6 digit OTP" maxlength="6" inputmode="numeric">
+                    </div>
+                    <div class="button-group">
+                         <button id="login-btn" class="btn btn-success">Continue</button>
+                         <button id="close-otp-popup-btn" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Screen (Initially Hidden) -->
+    <div id="main-app-screen" class="screen hidden">
+        <header class="app-header">
+            <!-- Fake Recent Withdrawals Ticker -->
+            <div class="fake-withdrawals">
+                <div class="ticker-wrap">
+                    <div class="ticker-move">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="wallet-info container">
+                <span class="balance-label">Balance:</span>
+                <span id="user-balance" class="balance-amount">₹ 0.00</span>
+                <button id="deposit-btn-header" class="btn btn-deposit">Deposit</button>
+            </div>
+        </header>
+
+        <main class="app-main container">
+            <h2>Spin the Wheel!</h2>
+
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div> <!-- Pointer styled by CSS -->
+                <div id="wheel" class="wheel">
+                    <!-- Segments are created via CSS background conic-gradient -->
+                    <div class="wheel-inner">SPIN</div>
+                </div>
+            </div>
+
+            <div id="spin-result" class="spin-result-display">Ready to Spin!</div>
+
+            <button id="spin-btn" class="btn btn-spin" disabled>
+                Spin (Cost: ₹ 10)
+            </button>
+            <p class="spin-outcomes">Win ₹5 to ₹100 or Lose ₹10</p>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2023 Spin King (Simulation)</p>
+        </footer>
+    </div>
+
+    <!-- Deposit Screen (Initially Hidden) -->
+     <div id="deposit-screen" class="screen hidden">
+         <div class="container">
+            <button id="back-to-main-btn" class="btn btn-back">&lt; Back</button>
+            <h2>Add Funds</h2>
+            <div class="input-group">
+                <label for="deposit-amount">Amount (Min ₹50):</label>
+                <input type="number" id="deposit-amount" name="deposit-amount" min="50" value="50" placeholder="Enter amount" inputmode="numeric">
+            </div>
+            <p>Simulated Payment via UPI:</p>
+            <button id="pay-via-upi-btn" class="btn btn-success btn-full">Proceed to Pay ₹<span id="deposit-pay-amount">50</span> (Simulated)</button>
+            <!-- In a real app, this would show UPI options -->
+            <div class="simulated-payment-notice">
+                This is a simulation. Clicking "Proceed" will instantly add the amount to your balance for demo purposes. No real payment occurs.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- START EMBEDDED JAVASCRIPT ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Get DOM Elements ---
+            const loadingIndicator = document.getElementById('loading');
+            const loginScreen = document.getElementById('login-screen');
+            const mainAppScreen = document.getElementById('main-app-screen');
+            const depositScreen = document.getElementById('deposit-screen');
+            const otpPopup = document.getElementById('otp-popup');
+
+            const mobileInput = document.getElementById('mobile');
+            const sendOtpBtn = document.getElementById('send-otp-btn');
+            const otpMobileDisplay = document.getElementById('otp-mobile-display');
+            const simulatedOtpValue = document.getElementById('simulated-otp-value');
+            const otpInput = document.getElementById('otp');
+            const loginBtn = document.getElementById('login-btn');
+            const closeOtpPopupBtn = document.getElementById('close-otp-popup-btn');
+
+            const userBalanceDisplay = document.getElementById('user-balance');
+            const depositBtnHeader = document.getElementById('deposit-btn-header');
+            const spinBtn = document.getElementById('spin-btn');
+            const wheel = document.getElementById('wheel');
+            const spinResultDisplay = document.getElementById('spin-result');
+            const fakeWithdrawalsTicker = document.querySelector('.ticker-move');
+
+            const backToMainBtn = document.getElementById('back-to-main-btn');
+            const depositAmountInput = document.getElementById('deposit-amount');
+            const depositPayAmount = document.getElementById('deposit-pay-amount');
+            const payViaUpiBtn = document.getElementById('pay-via-upi-btn');
+
+            // --- App State ---
+            let currentUserBalance = 0;
+            let isSpinning = false;
+            const SPIN_COST = 10;
+            const JOINING_BONUS = 50;
+            const MIN_DEPOSIT = 50;
+            let currentRotation = 0; // Track wheel rotation
+
+            // --- Functions ---
+
+            // Update balance display
+            function updateBalanceDisplay() {
+                userBalanceDisplay.textContent = `₹ ${currentUserBalance.toFixed(2)}`;
+                // Enable/disable spin button based on balance
+                spinBtn.disabled = currentUserBalance < SPIN_COST || isSpinning;
+            }
+
+            // Navigate between screens
+            function showScreen(screenToShow) {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                screenToShow.classList.add('active');
+            }
+
+            // Show/Hide OTP Popup
+            function showOtpPopup(show = true) {
+                if (show) {
+                    otpPopup.classList.remove('hidden');
+                } else {
+                    otpPopup.classList.add('hidden');
+                }
+            }
+
+            // Simulate OTP Send
+            function handleSendOtp() {
+                const mobileNumber = mobileInput.value.trim();
+                if (mobileNumber.length === 10 && /^\d+$/.test(mobileNumber)) {
+                    otpMobileDisplay.textContent = `+91 ${mobileNumber}`;
+                    // In a real app, an API call would be made here
+                    // For simulation, generate a fake OTP display
+                    simulatedOtpValue.textContent = Math.floor(100000 + Math.random() * 900000);
+                    otpInput.value = ''; // Clear previous OTP input
+                    showOtpPopup(true);
+                } else {
+                    alert('Please enter a valid 10-digit mobile number.');
+                }
+            }
+
+            // Simulate Login
+            function handleLogin() {
+                // Simple validation (in real app, check against sent OTP)
+                const enteredOtp = otpInput.value.trim();
+                if (enteredOtp.length === 6 && /^\d+$/.test(enteredOtp)) {
+                    // Simulate successful login
+                    currentUserBalance = JOINING_BONUS; // Award joining bonus
+                    updateBalanceDisplay();
+                    showScreen(mainAppScreen);
+                    showOtpPopup(false);
+                    startFakeWithdrawals();
+                } else {
+                    alert('Invalid OTP entered. Please enter the 6-digit code.');
+                }
+            }
+
+            // Generate Spin Result (SIMULATED ODDS - Adjust as needed)
+            function generateSpinResult() {
+                const rand = Math.random(); // Value between 0 and 1
+
+                // Define outcomes and their rough probabilities
+                // Example: ~5% chance of -10, ~15% chance of 5, etc.
+                // IMPORTANT: These odds heavily favor the house in this example!
+                if (rand < 0.08) return -10;   // 8% chance of loss (-10 result)
+                if (rand < 0.28) return 5;     // 20% chance of 5
+                if (rand < 0.53) return 10;    // 25% chance of 10 (break even before cost)
+                if (rand < 0.73) return 15;    // 20% chance of 15
+                if (rand < 0.85) return 20;    // 12% chance of 20
+                if (rand < 0.92) return 25;    // 7% chance of 25
+                if (rand < 0.97) return 50;    // 5% chance of 50
+                if (rand < 0.99) return 75;    // 2% chance of 75
+                return 100; // 1% chance of 100
+            }
+
+            // Handle Spin Action
+            function handleSpin() {
+                if (isSpinning || currentUserBalance < SPIN_COST) {
+                    return; // Don't spin if already spinning or insufficient funds
+                }
+
+                isSpinning = true;
+                spinBtn.disabled = true;
+                spinResultDisplay.textContent = "Spinning...";
+                spinResultDisplay.classList.remove('loss', 'win'); // Reset color
+
+                // --- Simulation ---
+                currentUserBalance -= SPIN_COST;
+                updateBalanceDisplay(); // Update balance immediately after deducting cost
+
+                const resultAmount = generateSpinResult();
+
+                // Calculate visual rotation for effect (doesn't determine the outcome)
+                // The number of segments visually doesn't strictly matter for the result logic
+                const randomDegrees = Math.random() * 360; // Random end point within a circle
+                const extraRotations = 360 * (5 + Math.floor(Math.random() * 3)); // Spin at least 5 times
+                const targetRotation = currentRotation + extraRotations + randomDegrees;
+                // Don't reset currentRotation exactly, let it accumulate for visual effect
+                // currentRotation = targetRotation % 360; // Use modulo if you want to keep track within 0-359
+
+                wheel.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
+
+                // After animation finishes (use setTimeout for simulation)
+                setTimeout(() => {
+                    // Apply the result AFTER the spin animation completes
+                    let balanceChange = 0;
+                    if (resultAmount === -10) {
+                         // The cost was already deducted, so the net effect of -10 is actually losing an *additional* 10
+                         // However, the instruction implies -10 IS the outcome value, so balance changes by -10
+                         balanceChange = -10;
+                         spinResultDisplay.textContent = `Oops! You lost ₹10!`;
+                         spinResultDisplay.classList.add('loss');
+                    } else {
+                         balanceChange = resultAmount; // Win amount
+                         spinResultDisplay.textContent = `You won ₹${resultAmount}!`;
+                         spinResultDisplay.classList.add('win'); // Could add a 'win' class for green color
+                    }
+
+                    currentUserBalance += balanceChange; // Adjust balance based on outcome
+                    // Ensure balance doesn't go below zero visually if desired, though real systems might allow negative
+                    if (currentUserBalance < 0) {
+                       // currentUserBalance = 0; // Option: Prevent negative balance display
+                    }
+
+                    updateBalanceDisplay(); // Update display with final balance
+                    isSpinning = false;
+                    // Re-enable button only if balance is sufficient AFTER the spin result
+                    spinBtn.disabled = currentUserBalance < SPIN_COST;
+
+                }, 5100); // Match timeout to CSS transition duration + small buffer
+            }
+
+            // Handle Deposit Flow
+            function showDepositScreen() {
+                depositAmountInput.value = MIN_DEPOSIT; // Reset to minimum
+                depositPayAmount.textContent = MIN_DEPOSIT;
+                showScreen(depositScreen);
+            }
+
+            function handleDepositAmountChange() {
+                let amount = parseInt(depositAmountInput.value) || MIN_DEPOSIT;
+                if (amount < MIN_DEPOSIT) {
+                    amount = MIN_DEPOSIT;
+                    depositAmountInput.value = MIN_DEPOSIT; // Correct input if below min
+                }
+                depositPayAmount.textContent = amount;
+            }
+
+            function handleSimulatedPayment() {
+                let amount = parseInt(depositAmountInput.value) || MIN_DEPOSIT;
+                 if (amount < MIN_DEPOSIT) {
+                    alert(`Minimum deposit amount is ₹${MIN_DEPOSIT}`);
+                    depositAmountInput.value = MIN_DEPOSIT;
+                    depositPayAmount.textContent = MIN_DEPOSIT;
+                    return;
+                }
+
+                // Simulate successful deposit
+                currentUserBalance += amount;
+                updateBalanceDisplay();
+                alert(`Successfully added ₹${amount.toFixed(2)} to your balance (Simulation).`);
+                showScreen(mainAppScreen); // Go back to main screen
+            }
+
+            // Fake Withdrawal Ticker
+            function generateFakeWithdrawal() {
+                const names = ["Rah**", "Poo**", "Vik**", "Ani**", "Sun**", "Dee**", "Man**", "Pri**", "Aka**", "Sne**", "Raj**", "Kum**", "Arj**", "Kat**"];
+                const amounts = [55, 120, 80, 250, 95, 150, 110, 300, 70, 180, 60, 210, 135, 90];
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+                return `<span>${randomName} just withdrew ₹${randomAmount}</span>`;
+            }
+
+            function startFakeWithdrawals() {
+                let items = '';
+                for (let i = 0; i < 20; i++) { // Create a bunch of items for smooth looping ticker
+                    items += generateFakeWithdrawal();
+                }
+                fakeWithdrawalsTicker.innerHTML = items;
+                // CSS handles the animation itself
+            }
+
+            // --- Event Listeners ---
+            sendOtpBtn.addEventListener('click', handleSendOtp);
+            closeOtpPopupBtn.addEventListener('click', () => showOtpPopup(false));
+            loginBtn.addEventListener('click', handleLogin);
+            spinBtn.addEventListener('click', handleSpin);
+            depositBtnHeader.addEventListener('click', showDepositScreen);
+            backToMainBtn.addEventListener('click', () => showScreen(mainAppScreen));
+            depositAmountInput.addEventListener('input', handleDepositAmountChange); // Use input for real-time update
+            payViaUpiBtn.addEventListener('click', handleSimulatedPayment);
+
+            // --- Initialization ---
+            updateBalanceDisplay(); // Initialize balance display (starts at 0 before login)
+            showScreen(loginScreen); // Start on login screen
+            loadingIndicator.classList.add('hidden'); // Hide loading indicator after setup
+
+        });
+
+        // --- END EMBEDDED JAVASCRIPT ---
+    </script>
+
+</body>
+</html>
