@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🚀 Spin Galaxy 2025 🚀 (Simulation)</title>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- START EMBEDDED CSS --- */
+        :root {
+            --bg-gradient-start: #1c1f2b; /* Darker Space Blue */
+            --bg-gradient-end: #302d40;   /* Slightly Lighter Purple/Blue */
+            --primary-accent: #8a4fff; /* Vibrant Purple */
+            --secondary-accent: #4fe8ff; /* Cyan/Teal */
+            --highlight-color: #ffc65a; /* Warm Gold */
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0b0;
+            --success: #30e0a1;
+            --danger: #ff6b6b;
+            --neutral-bg: #3a3a4f; /* Input/Popup Background */
+            --border-color: #505068;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body, html {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(145deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-primary);
+            height: 100%;
+            overscroll-behavior: none;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Screen Management --- */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 25px 0;
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 14px 28px; border: none; border-radius: 12px; /* Slightly less rounded */
+            cursor: pointer; font-size: 1rem; font-weight: 600; text-align: center;
+            transition: all 0.25s ease;
+            margin: 6px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            letter-spacing: 0.3px;
+        }
+        .btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
+        .btn:disabled {
+            background: #555 !important; color: var(--text-secondary) !important;
+            cursor: not-allowed; box-shadow: none; opacity: 0.6;
+        }
+        .btn i { font-size: 1.1rem; line-height: 1; } /* Ensure icon alignment */
+
+        .btn-gradient-primary { background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent)); color: #111; }
+        .btn-gradient-primary:hover:not(:disabled) { box-shadow: 0 5px 15px rgba(138, 79, 255, 0.3); opacity: 0.95; }
+
+        .btn-success { background-color: var(--success); color: #111; }
+        .btn-success:hover:not(:disabled) { background-color: #28c790; box-shadow: 0 5px 15px rgba(48, 224, 161, 0.3); }
+
+        .btn-secondary { background-color: var(--neutral-bg); color: var(--text-primary); }
+        .btn-secondary:hover:not(:disabled) { background-color: #4a4a5f; }
+
+        .btn-deposit { background-color: var(--highlight-color); color: #333; }
+        .btn-deposit:hover:not(:disabled) { background-color: #f0b94d; box-shadow: 0 5px 15px rgba(255, 198, 90, 0.3); }
+
+        .btn-withdraw { background-color: var(--danger); color: white; }
+        .btn-withdraw:hover:not(:disabled) { background-color: #e85a5a; box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3); }
+
+        .btn-spin {
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            color: #111; font-size: 1.25rem; padding: 18px 40px; border-radius: 50px;
+            box-shadow: 0 6px 12px rgba(138, 79, 255, 0.2);
+        }
+        .btn-spin:hover:not(:disabled) { box-shadow: 0 8px 20px rgba(138, 79, 255, 0.4); transform: translateY(-1px); }
+
+        .btn-full { width: calc(100% - 12px); margin: 10px 6px; }
+        .btn-back { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 15px; font-size: 0.9rem; margin-bottom: 20px; box-shadow: none; letter-spacing: 0; }
+        .btn-back:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+
+        /* --- Forms --- */
+        .input-group { margin-bottom: 22px; }
+        .input-group label {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 10px; font-weight: 500; color: var(--text-secondary); font-size: 0.95rem;
+        }
+        .input-group input[type="tel"],
+        .input-group input[type="text"],
+        .input-group input[type="number"] {
+            width: 100%; padding: 15px; background-color: var(--neutral-bg);
+            border: 1px solid var(--border-color); border-radius: 10px; font-size: 1rem;
+            color: var(--text-primary); transition: all 0.3s ease; appearance: textfield;
+            -moz-appearance: textfield;
+        }
+        .input-group input:focus {
+            outline: none; border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(138, 79, 255, 0.2);
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* --- Login Screen --- */
+        #login-screen { text-align: center; padding-top: 60px; }
+        #login-screen h1 {
+            font-size: 2.8rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin-bottom: 15px; display: inline-flex; align-items: center; gap: 15px;
+        }
+        #login-screen p { color: var(--text-secondary); margin-bottom: 35px; font-size: 1.1rem; }
+
+        /* --- Popups --- */
+        .popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(10, 10, 20, 0.8); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .popup:not(.hidden) { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+        .popup-content {
+            background-color: var(--neutral-bg); padding: 35px 40px; border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3); text-align: center; max-width: 90%;
+            width: 400px; border: 1px solid var(--border-color);
+            transform: scale(0.95); opacity: 0; transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        .popup:not(.hidden) .popup-content { transform: scale(1); opacity: 1; }
+        .popup-content h2 { margin-bottom: 20px; color: var(--highlight-color); font-size: 1.6rem; display: inline-flex; align-items: center; gap: 10px; }
+        .popup-content p { margin-bottom: 12px; color: var(--text-secondary); }
+        .popup .button-group { margin-top: 30px; display: flex; justify-content: space-between; gap: 15px; }
+        .simulated-otp { font-size: 0.9em; color: #aaa; }
+        .simulated-otp strong { color: var(--highlight-color); font-weight: bold; }
+        .available-balance { font-size: 1.1rem; color: var(--success); margin-bottom: 18px; font-weight: 600;}
+        .withdraw-notice { font-size: 0.85em; color: var(--text-secondary); margin-top: 18px;}
+
+        /* --- Main App Screen Header --- */
+        .app-header {
+            background-color: rgba(28, 31, 43, 0.8); /* Semi-transparent header */
+            backdrop-filter: blur(8px);
+            color: white; padding: 15px 0; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border-color);
+        }
+        .header-content {
+            display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-balance-box { text-align: center; }
+        .header-label {
+            font-size: 0.85rem; color: var(--text-secondary); display: block; margin-bottom: 4px;
+            text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .header-amount {
+            font-size: 1.5rem; font-weight: 700; line-height: 1.2;
+        }
+        .header-amount.wallet { color: var(--highlight-color); }
+        .header-amount.last-win { color: var(--secondary-accent); } /* Different color for last win */
+        .header-actions { margin-top: 15px; display: flex; justify-content: center; gap: 15px; }
+
+        /* --- Main App Area --- */
+        .app-main { text-align: center; padding: 40px 15px; }
+        .app-main h2 { margin-bottom: 35px; color: var(--text-primary); font-size: 1.9rem; font-weight: 600; }
+
+        /* --- REVISED Spinning Wheel --- */
+        .wheel-container {
+            position: relative; width: 320px; height: 320px;
+            margin: 0 auto 45px auto; display: flex; justify-content: center; align-items: center;
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25));
+        }
+        .wheel-pointer {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+            border-top: 35px solid var(--highlight-color); /* Gold pointer */
+            z-index: 10; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
+            transition: transform 0.2s ease-out; /* Pointer bounce effect */
+        }
+        .wheel-pointer.active { transform: translateX(-50%) scale(1.1); } /* Bounce effect */
+
+        .wheel {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 6px solid rgba(255, 255, 255, 0.8); /* Slightly transparent border */
+            box-shadow: inset 0 0 0 6px var(--neutral-bg); /* Inner ring */
+            position: relative; overflow: hidden;
+            transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1); /* Updated easing */
+            /* Gradient colors matching the segments */
+            background: conic-gradient(
+                #4caf50 0deg 40deg,  /* 5 */
+                #2196f3 40deg 80deg,  /* 10 */
+                #9c27b0 80deg 120deg, /* 25 */
+                #ff9800 120deg 160deg, /* 45 */
+                #00bcd4 160deg 200deg, /* 65 */
+                #455a64 200deg 240deg, /* -10 (Dark Gray) */
+                #8bc34a 240deg 280deg, /* 80 */
+                #ffeb3b 280deg 320deg, /* 85 (Yellow) */
+                #e91e63 320deg 360deg  /* 100 (Pink) */
+            );
+        }
+        .wheel-segment-label { /* Positioned labels directly on the wheel */
+            position: absolute; top: 0; left: 50%; width: 50%; height: 50%;
+            transform-origin: 0% 100%; /* Rotate from center */
+            text-align: center; display: flex; justify-content: center; align-items: flex-start;
+            padding-top: 20px; /* Push text towards edge */
+            font-weight: 600; font-size: 1.1rem; color: rgba(255, 255, 255, 0.95);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.4); pointer-events: none;
+        }
+        .wheel-segment-label span {
+            display: block; transform: rotate(-90deg) translateY(-50%); /* Adjust text orientation */
+        }
+        /* Position each label (Angle = Midpoint of segment) */
+        .label-0 { transform: rotate(20deg); }  /* 5 */
+        .label-1 { transform: rotate(60deg); }  /* 10 */
+        .label-2 { transform: rotate(100deg); } /* 25 */
+        .label-3 { transform: rotate(140deg); } /* 45 */
+        .label-4 { transform: rotate(180deg); } /* 65 */
+        .label-5 { transform: rotate(220deg); color: #ffcccb; } /* -10 */
+        .label-6 { transform: rotate(260deg); } /* 80 */
+        .label-7 { transform: rotate(300deg); color: #333; } /* 85 (Dark text on yellow) */
+        .label-8 { transform: rotate(340deg); } /* 100 */
+
+        .wheel-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 75px; height: 75px;
+            background: radial-gradient(circle, #fff 20%, #e0e0e0 100%);
+            border-radius: 50%; z-index: 5; box-shadow: 0 0 12px rgba(0,0,0,0.2);
+            border: 4px solid #ccc; display: flex; justify-content: center; align-items: center;
+            color: var(--primary-accent); font-weight: bold; font-size: 2rem;
+        }
+
+        /* --- Spin Result & Cost --- */
+        .spin-result-display {
+            margin-top: 40px; font-size: 1.6rem; font-weight: 700; min-height: 45px;
+            transition: all 0.3s ease;
+        }
+        .spin-result-display.default { color: var(--secondary-accent); }
+        .spin-result-display.loss { color: var(--danger); transform: scale(1.05); }
+        .spin-result-display.win { color: var(--success); transform: scale(1.1); }
+        .spin-result-display.notice { color: var(--highlight-color); font-size: 1.2rem; font-weight: 500; }
+
+        .spin-cost-display {
+            font-size: 1rem; color: var(--text-secondary); margin-top: 18px; margin-bottom: 28px;
+        }
+        .spin-cost-display strong { color: var(--text-primary); font-weight: 600; }
+
+        /* --- Footer --- */
+        .app-footer {
+            text-align: center; padding: 30px; margin-top: 50px; font-size: 0.9rem;
+            color: #888; border-top: 1px solid var(--border-color);
+        }
+
+        /* --- Loading Indicator --- */
+        #loading {
+             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+             background: var(--bg-gradient-start);
+             display: flex; flex-direction: column; justify-content: center; align-items: center;
+             z-index: 9999; font-size: 1.5rem; color: var(--secondary-accent); font-weight: 600;
+        }
+         .loader { /* Modern spinner */
+            width: 55px; height: 55px; border-radius: 50%;
+            display: inline-block; border-top: 4px solid var(--secondary-accent);
+            border-right: 4px solid transparent; box-sizing: border-box;
+            animation: loading-spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes loading-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading.hidden { display: none; }
+
+        /* --- Confetti --- */
+        .confetti {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden; z-index: 2000; display: none;
+        }
+        .confetti.active { display: block; }
+        .confetti-piece {
+            position: absolute; width: 8px; height: 12px; background: #f00;
+            top: -20px; opacity: 0; animation: fall 3.5s linear infinite; border-radius: 3px;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0vh) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotateZ(720deg); opacity: 0; }
+        }
+
+        /* --- END EMBEDDED CSS --- */
+    </style>
+</head>
+<body>
+
+    <!-- Loading Indicator -->
+    <div id="loading"><div class="loader"></div>Loading Galaxy...</div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1><i class="fa-solid fa-rocket"></i> Spin Galaxy</h1>
+            <p>Enter the portal with your Mobile Number!</p>
+            <div class="input-group">
+                <label for="mobile"><i class="fa-solid fa-mobile-screen-button"></i> Mobile Number (+91)</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Your 10 digit number" maxlength="10" inputmode="numeric">
+            </div>
+            <button id="send-otp-btn" class="btn btn-gradient-primary btn-full"><i class="fa-solid fa-paper-plane"></i> Launch OTP</button>
+
+            <!-- OTP Popup -->
+            <div id="otp-popup" class="popup hidden">
+                <div class="popup-content">
+                    <h2><i class="fa-solid fa-user-shield"></i> Galactic Verification</h2>
+                    <p>Enter the code sent to <span id="otp-mobile-display"></span></p>
+                    <p class="simulated-otp">(Simulated Code: <strong id="simulated-otp-value">123456</strong>)</p>
+                    <div class="input-group">
+                        <label for="otp"><i class="fa-solid fa-key"></i> Access Code</label>
+                        <input type="text" id="otp" name="otp" placeholder="6 digit code" maxlength="6" inputmode="numeric">
+                    </div>
+                    <div class="button-group">
+                         <button id="login-btn" class="btn btn-success"><i class="fa-solid fa-check-double"></i> Engage</button>
+                         <button id="close-otp-popup-btn" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Abort</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <footer class="app-footer" style="border-top: none; margin-top: 60px;">
+            <p><i class="fa-solid fa-triangle-exclamation"></i> Simulation Only. Play Responsibly.</p>
+        </footer>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="main-app-screen" class="screen hidden">
+        <header class="app-header">
+            <div class="header-content container">
+                 <!-- Balances -->
+                 <div class="header-balance-box">
+                     <span class="header-label"><i class="fa-solid fa-wallet"></i> Wallet</span>
+                     <span id="user-wallet-balance" class="header-amount wallet">₹ 0.00</span>
+                 </div>
+                 <div class="header-balance-box">
+                     <span class="header-label"><i class="fa-solid fa-star"></i> Last Win</span>
+                     <span id="last-win-amount" class="header-amount last-win">₹ 0.00</span>
+                 </div>
+                  <!-- Actions -->
+                 <div class="header-actions">
+                    <button id="deposit-btn-header" class="btn btn-deposit"><i class="fa-solid fa-coins"></i> Deposit</button>
+                    <button id="withdraw-btn-header" class="btn btn-withdraw"><i class="fa-solid fa-hand-holding-dollar"></i> Withdraw</button>
+                 </div>
+            </div>
+        </header>
+
+        <main class="app-main container">
+            <h2><i class="fa-solid fa-meteor"></i> Spin the Cosmic Wheel!</h2>
+
+            <!-- Wheel -->
+            <div class="wheel-container">
+                <div id="wheel-pointer" class="wheel-pointer"></div>
+                <div id="wheel" class="wheel">
+                     <!-- Static Labels (Positioned by CSS) -->
+                    <div class="wheel-segment-label label-0"><span>₹5</span></div>
+                    <div class="wheel-segment-label label-1"><span>₹10</span></div>
+                    <div class="wheel-segment-label label-2"><span>₹25</span></div>
+                    <div class="wheel-segment-label label-3"><span>₹45</span></div>
+                    <div class="wheel-segment-label label-4"><span>₹65</span></div>
+                    <div class="wheel-segment-label label-5"><span>₹-10</span></div>
+                    <div class="wheel-segment-label label-6"><span>₹80</span></div>
+                    <div class="wheel-segment-label label-7"><span>₹85</span></div>
+                    <div class="wheel-segment-label label-8"><span>₹100</span></div>
+                </div>
+                 <div class="wheel-center"><i class="fa-solid fa-atom"></i></div>
+            </div>
+
+            <!-- Spin Result Display -->
+            <div id="spin-result" class="spin-result-display default">Let's Spin! ✨</div>
+
+            <!-- Spin Button & Cost -->
+             <p class="spin-cost-display">Spin Cost: <strong>₹ 10</strong> (from Wallet)</p>
+            <button id="spin-btn" class="btn btn-spin" disabled>
+                <i class="fa-solid fa-play"></i> Spin Now!
+            </button>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 Spin Galaxy (Simulation). Have Fun!</p>
+        </footer>
+    </div>
+
+    <!-- Deposit Screen -->
+     <div id="deposit-screen" class="screen hidden">
+         <div class="container">
+            <button id="back-to-main-btn-deposit" class="btn btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Galaxy</button>
+            <h2 style="text-align: center; margin-bottom: 35px;"><i class="fa-solid fa-piggy-bank"></i> Boost Your Wallet</h2>
+            <div class="input-group">
+                <label for="deposit-amount"><i class="fa-solid fa-indian-rupee-sign"></i> Amount (Min ₹50)</label>
+                <input type="number" id="deposit-amount" name="deposit-amount" min="50" value="50" placeholder="Enter amount" inputmode="numeric">
+            </div>
+            <p style="text-align:center; color: var(--text-secondary); margin-bottom: 15px;">Simulated Secure Payment</p>
+            <button id="pay-via-upi-btn" class="btn btn-success btn-full"><i class="fa-solid fa-shield-halved"></i> Deposit ₹<span id="deposit-pay-amount">50</span> (Simulated)</button>
+            <div class="simulated-payment-notice" style="margin-top: 25px; font-size: 0.9em; color: var(--text-secondary); background-color: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; text-align: center; border: 1px dashed var(--border-color);">
+                <i class="fa-solid fa-circle-info"></i> This is a simulation. Funds added instantly to Wallet Balance. No real transaction.
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Popup -->
+    <div id="withdrawal-popup" class="popup hidden">
+        <div class="popup-content">
+            <h2><i class="fa-solid fa-money-bill-transfer"></i> Withdraw Winnings</h2>
+            <p class="available-balance">Winnings Available: <strong id="withdrawable-balance">₹ 0.00</strong></p>
+             <div class="input-group">
+                <label for="withdraw-amount"><i class="fa-solid fa-cash-register"></i> Amount (Min ₹500)</label>
+                <input type="number" id="withdraw-amount" name="withdraw-amount" min="1" placeholder="Enter amount" inputmode="numeric">
+            </div>
+             <div class="input-group">
+                <label for="withdraw-upi"><i class="fa-solid fa-qrcode"></i> UPI ID / Bank Details</label>
+                <input type="text" id="withdraw-upi" name="withdraw-upi" placeholder="your.email@bankupi">
+            </div>
+            <div class="button-group">
+                 <button id="confirm-withdraw-btn" class="btn btn-success"><i class="fa-solid fa-check"></i> Withdraw Now</button>
+                 <button id="close-withdraw-popup-btn" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            </div>
+             <p class="withdraw-notice"><i class="fa-solid fa-info-circle"></i> Simulation: Withdrawal processed instantly.</p>
+        </div>
+    </div>
+
+     <!-- Confetti Container -->
+    <div id="confetti-container" class="confetti"></div>
+
+    <!-- Audio Elements (Keep providing your own MP3 files) -->
+    <audio id="spin-audio" src="spin-sound.mp3" preload="auto"></audio>
+    <audio id="win-audio" src="win-sound.mp3" preload="auto"></audio>
+
+    <script>
+        // --- START EMBEDDED JAVASCRIPT ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Get DOM Elements ---
+            const loadingIndicator = document.getElementById('loading');
+            const screens = {
+                login: document.getElementById('login-screen'),
+                main: document.getElementById('main-app-screen'),
+                deposit: document.getElementById('deposit-screen'),
+            };
+            const popups = {
+                otp: document.getElementById('otp-popup'),
+                withdrawal: document.getElementById('withdrawal-popup'),
+            };
+
+            // Login Elements
+            const mobileInput = document.getElementById('mobile');
+            const sendOtpBtn = document.getElementById('send-otp-btn');
+            const otpMobileDisplay = document.getElementById('otp-mobile-display');
+            const simulatedOtpValue = document.getElementById('simulated-otp-value');
+            const otpInput = document.getElementById('otp');
+            const loginBtn = document.getElementById('login-btn');
+            const closeOtpPopupBtn = document.getElementById('close-otp-popup-btn');
+
+            // Main Screen Elements
+            const walletBalanceDisplay = document.getElementById('user-wallet-balance');
+            const lastWinAmountDisplay = document.getElementById('last-win-amount'); // Changed ID
+            const depositBtnHeader = document.getElementById('deposit-btn-header');
+            const withdrawBtnHeader = document.getElementById('withdraw-btn-header');
+            const spinBtn = document.getElementById('spin-btn');
+            const wheel = document.getElementById('wheel');
+            const wheelPointer = document.getElementById('wheel-pointer');
+            const spinResultDisplay = document.getElementById('spin-result');
+
+            // Deposit Screen Elements
+            const backToMainBtnDeposit = document.getElementById('back-to-main-btn-deposit');
+            const depositAmountInput = document.getElementById('deposit-amount');
+            const depositPayAmount = document.getElementById('deposit-pay-amount');
+            const payViaUpiBtn = document.getElementById('pay-via-upi-btn');
+
+            // Withdrawal Popup Elements
+            const withdrawableBalanceDisplay = document.getElementById('withdrawable-balance');
+            const withdrawAmountInput = document.getElementById('withdraw-amount');
+            const withdrawUpiInput = document.getElementById('withdraw-upi');
+            const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
+            const closeWithdrawPopupBtn = document.getElementById('close-withdraw-popup-btn');
+
+            // Audio Elements
+            const spinAudio = document.getElementById('spin-audio');
+            const winAudio = document.getElementById('win-audio');
+
+            // Confetti
+            const confettiContainer = document.getElementById('confetti-container');
+
+            // --- App State ---
+            let walletBalance = 0;
+            let winningBalance = 0;
+            let lastWinAmount = 0; // Track last win
+            let isSpinning = false;
+            const SPIN_COST = 10;
+            const JOINING_BONUS = 50;
+            const MIN_DEPOSIT = 50;
+            const MIN_WITHDRAWAL = 500; // Updated minimum withdrawal
+            let currentWheelRotation = 0; // Track wheel rotation for animation
+
+            // Define the wheel outcomes IN ORDER corresponding to CSS segments
+            const wheelOutcomes = [5, 10, 25, 45, 65, -10, 80, 85, 100];
+            const segmentAngle = 360 / wheelOutcomes.length; // 40 degrees
+
+            // --- Core Functions ---
+
+            // Update ALL balance displays
+            function updateUIDisplays() {
+                walletBalanceDisplay.textContent = `₹ ${walletBalance.toFixed(2)}`;
+                lastWinAmountDisplay.textContent = `₹ ${lastWinAmount.toFixed(2)}`;
+                // Update withdrawable amount in popup only when it's opened
+                checkSpinAvailability();
+            }
+
+            // Check if user can afford to spin (uses ONLY Wallet Balance)
+            function checkSpinAvailability() {
+                spinBtn.disabled = walletBalance < SPIN_COST || isSpinning;
+                // Optionally update result display if disabled due to low balance
+                if (walletBalance < SPIN_COST && !isSpinning) {
+                    spinResultDisplay.textContent = " Wallet low! Deposit to spin. 👛";
+                    spinResultDisplay.className = 'spin-result-display notice';
+                } else if (!isSpinning) {
+                    // Reset message if balance is okay and not spinning
+                    // spinResultDisplay.textContent = "Let's Spin! ✨";
+                    // spinResultDisplay.className = 'spin-result-display default';
+                }
+            }
+
+            // Navigate between screens
+            function showScreen(screenKey) {
+                Object.values(screens).forEach(screen => screen.classList.remove('active'));
+                screens[screenKey].classList.add('active');
+            }
+
+            // Show/Hide Popups
+            function showPopup(popupKey, show = true) {
+                const popupElement = popups[popupKey];
+                if (show) {
+                    // Update withdrawable balance just before showing the popup
+                    if (popupKey === 'withdrawal') {
+                        withdrawableBalanceDisplay.textContent = `₹ ${winningBalance.toFixed(2)}`;
+                        withdrawAmountInput.max = winningBalance; // Update max attr
+                    }
+                    popupElement.classList.remove('hidden');
+                } else {
+                    popupElement.classList.add('hidden');
+                }
+            }
+
+             // Play Sound Helper
+            function playSound(audioElement) {
+                audioElement.currentTime = 0;
+                audioElement.play().catch(error => console.log("Audio play failed:", error));
+            }
+
+            // Trigger Pointer bounce animation
+             function bouncePointer() {
+                 wheelPointer.classList.add('active');
+                 setTimeout(() => wheelPointer.classList.remove('active'), 200);
+            }
+
+            // --- Event Handlers ---
+
+            // Simulate OTP Send
+            function handleSendOtp() {
+                const mobileNumber = mobileInput.value.trim();
+                if (mobileNumber.length === 10 && /^\d+$/.test(mobileNumber)) {
+                    otpMobileDisplay.textContent = `+91 ${mobileNumber}`;
+                    simulatedOtpValue.textContent = Math.floor(100000 + Math.random() * 900000);
+                    otpInput.value = '';
+                    showPopup('otp', true);
+                } else {
+                    alert('⚠️ Please enter a valid 10-digit mobile number.');
+                }
+            }
+
+            // Simulate Login
+            function handleLogin() {
+                const enteredOtp = otpInput.value.trim();
+                if (enteredOtp.length === 6 && /^\d+$/.test(enteredOtp)) {
+                    walletBalance = JOINING_BONUS; // Bonus to Wallet
+                    winningBalance = 0;
+                    lastWinAmount = 0; // Reset last win on login
+                    updateUIDisplays(); // Update all displays
+                    showScreen('main');
+                    showPopup('otp', false);
+                    spinResultDisplay.textContent = "Welcome! Ready to Spin! ✨"; // Welcome message
+                    spinResultDisplay.className = 'spin-result-display default';
+                } else {
+                    alert('🚫 Invalid Access Code.');
+                }
+            }
+
+            // Handle Spin Action (Revised Logic)
+            function handleSpin() {
+                if (isSpinning) return; // Prevent multiple spins
+
+                if (walletBalance < SPIN_COST) {
+                    spinResultDisplay.textContent = " Wallet low! Deposit to spin. 👛";
+                    spinResultDisplay.className = 'spin-result-display notice';
+                    alert('Insufficient Wallet Balance! Please deposit funds.');
+                    return;
+                }
+
+                isSpinning = true;
+                spinBtn.disabled = true;
+                spinResultDisplay.textContent = "Spinning the cosmos... 💫";
+                spinResultDisplay.className = 'spin-result-display default'; // Reset color
+                playSound(spinAudio);
+                bouncePointer(); // Visual cue
+
+                // Deduct Spin Cost ONLY from Wallet Balance
+                walletBalance -= SPIN_COST;
+                updateUIDisplays(); // Show deduction immediately
+
+                // --- Determine Outcome FIRST ---
+                const winningIndex = Math.floor(Math.random() * wheelOutcomes.length);
+                const resultAmount = wheelOutcomes[winningIndex];
+
+                // --- Calculate Target Rotation for Animation ---
+                const targetSegmentCenter = (winningIndex * segmentAngle) + (segmentAngle / 2);
+                const pointerOffset = 90; // Adjust based on pointer position (top = -90 or 270)
+                const rotationAdjustment = 360 - targetSegmentCenter + pointerOffset;
+                const extraRotations = 360 * (6 + Math.floor(Math.random() * 4)); // 6-9 full spins
+                const targetRotation = currentWheelRotation + extraRotations + rotationAdjustment;
+
+                // Apply animation
+                wheel.style.transition = 'transform 6s cubic-bezier(0.25, 1, 0.5, 1)';
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
+                // No need to store currentWheelRotation if we always add full spins
+
+                // --- Handle Result AFTER Animation ---
+                setTimeout(() => {
+                    if (resultAmount === -10) {
+                        // Loss: This specific outcome affects Winnings (as per simulation rules)
+                        // If Winnings can't cover, it's just lost. Wallet is untouched here.
+                        let actualLoss = Math.min(10, winningBalance); // Can only lose up to available winnings for -10
+                        winningBalance -= actualLoss;
+                        if(winningBalance < 0) winningBalance = 0; // Floor at 0
+
+                        lastWinAmount = -10; // Show the loss as "last win"
+                        spinResultDisplay.textContent = `Oops! Hit -₹10! 💥`;
+                        spinResultDisplay.classList.add('loss');
+                    } else if (resultAmount > 0) {
+                        // Win: Add directly to Winning Balance
+                        winningBalance += resultAmount;
+                        lastWinAmount = resultAmount; // Update last win amount
+                        spinResultDisplay.textContent = `🚀 Awesome! You won ₹${resultAmount}! 🚀`;
+                        spinResultDisplay.classList.add('win');
+                        playSound(winAudio);
+                        triggerConfetti();
+                    }
+                    // No 'else' needed as 0 is not an outcome
+
+                    updateUIDisplays(); // Update displays with final results
+                    isSpinning = false;
+                    checkSpinAvailability(); // Re-enable button if possible
+
+                }, 6100); // Match timeout to CSS animation duration + buffer
+            }
+
+            // Handle Deposit Flow
+            function showDepositScreen() {
+                depositAmountInput.value = MIN_DEPOSIT;
+                depositPayAmount.textContent = MIN_DEPOSIT;
+                showScreen('deposit');
+            }
+
+            function handleDepositAmountChange() {
+                let amount = parseInt(depositAmountInput.value) || MIN_DEPOSIT;
+                if (amount < MIN_DEPOSIT) {
+                    amount = MIN_DEPOSIT;
+                    depositAmountInput.value = MIN_DEPOSIT;
+                }
+                depositPayAmount.textContent = amount;
+            }
+
+            function handleSimulatedPayment() {
+                let amount = parseInt(depositAmountInput.value);
+                 if (isNaN(amount) || amount < MIN_DEPOSIT) {
+                    alert(`⚠️ Minimum deposit is ₹${MIN_DEPOSIT}`);
+                    depositAmountInput.value = MIN_DEPOSIT;
+                    depositPayAmount.textContent = MIN_DEPOSIT;
+                    return;
+                }
+                walletBalance += amount; // Deposit goes to Wallet
+                updateUIDisplays();
+                alert(`✅ Deposit Successful! ₹${amount.toFixed(2)} added to your Wallet (Simulation).`);
+                showScreen('main');
+            }
+
+            // Handle Withdrawal Flow
+            function showWithdrawalPopup() {
+                // Update display right before showing
+                 withdrawableBalanceDisplay.textContent = `₹ ${winningBalance.toFixed(2)}`;
+                 withdrawAmountInput.value = '';
+                 withdrawUpiInput.value = '';
+                 withdrawAmountInput.max = winningBalance; // Set max dynamically
+                 showPopup('withdrawal', true);
+            }
+
+            function handleConfirmWithdrawal() {
+                const amountToWithdraw = parseFloat(withdrawAmountInput.value);
+                const upiDetails = withdrawUpiInput.value.trim();
+
+                if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
+                    alert('⚠️ Please enter a valid positive amount.'); return;
+                }
+                if (amountToWithdraw < MIN_WITHDRAWAL) { // Use updated minimum
+                    alert(`⚠️ Minimum withdrawal is ₹ ${MIN_WITHDRAWAL.toFixed(2)}.`); return;
+                }
+                if (amountToWithdraw > winningBalance) {
+                    alert('🚫 Insufficient Winning Balance for this withdrawal.'); return;
+                }
+                if (!upiDetails) { // Basic check if empty
+                    alert('⚠️ Please enter your UPI ID or Bank Details.'); return;
+                }
+
+                // Simulate successful withdrawal
+                winningBalance -= amountToWithdraw;
+                updateUIDisplays(); // Update header/internal state
+                alert(`✅ Withdrawal Initiated! ₹${amountToWithdraw.toFixed(2)} is on its way to ${upiDetails} (Simulation).`);
+                showPopup('withdrawal', false);
+            }
+
+            // Confetti Trigger
+            function triggerConfetti() {
+                confettiContainer.innerHTML = '';
+                confettiContainer.classList.add('active');
+                const colors = ['#8a4fff', '#4fe8ff', '#ffc65a', '#30e0a1', '#ff6b6b', '#ffffff'];
+                for (let i = 0; i < 120; i++) { // More confetti!
+                    const piece = document.createElement('div');
+                    piece.classList.add('confetti-piece');
+                    piece.style.left = Math.random() * 100 + 'vw';
+                    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.animationDelay = Math.random() * 1.5 + 's';
+                    const size = Math.random() * 6 + 6; // Vary size
+                    piece.style.width = size + 'px';
+                    piece.style.height = size * 1.5 + 'px'; // Rectangular confetti
+                    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    confettiContainer.appendChild(piece);
+                }
+                setTimeout(() => {
+                     confettiContainer.classList.remove('active');
+                     confettiContainer.innerHTML = '';
+                }, 5000);
+            }
+
+
+            // --- Event Listeners Setup ---
+            // Login
+            sendOtpBtn.addEventListener('click', handleSendOtp);
+            closeOtpPopupBtn.addEventListener('click', () => showPopup('otp', false));
+            loginBtn.addEventListener('click', handleLogin);
+            // Main Screen
+            spinBtn.addEventListener('click', handleSpin);
+            depositBtnHeader.addEventListener('click', showDepositScreen);
+            withdrawBtnHeader.addEventListener('click', showWithdrawalPopup);
+            // Deposit Screen
+            backToMainBtnDeposit.addEventListener('click', () => showScreen('main'));
+            depositAmountInput.addEventListener('input', handleDepositAmountChange);
+            payViaUpiBtn.addEventListener('click', handleSimulatedPayment);
+            // Withdrawal Popup
+             confirmWithdrawBtn.addEventListener('click', handleConfirmWithdrawal);
+             closeWithdrawPopupBtn.addEventListener('click', () => showPopup('withdrawal', false));
+
+            // --- Initialization ---
+            updateUIDisplays(); // Initialize displays
+            showScreen('login'); // Start on login
+            loadingIndicator.classList.add('hidden'); // Hide loading
+
+        });
+
+        // --- END EMBEDDED JAVASCRIPT ---
+    </script>
+
+</body>
+</html>
