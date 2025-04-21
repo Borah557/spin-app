@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Spin King INR</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Simple loading indicator -->
+    <style>#loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 1.5em; } </style>
+</head>
+<body>
+
+    <div id="loading">Loading...</div>
+
+    <!-- Login Screen (Initially Visible) -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1>Spin King</h1>
+            <p>Login with Mobile Number</p>
+            <div class="input-group">
+                <label for="mobile">Mobile Number (+91):</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter 10 digit number" maxlength="10" inputmode="numeric">
+            </div>
+            <button id="send-otp-btn" class="btn btn-primary">Send OTP</button>
+
+            <!-- OTP Popup (Initially Hidden) -->
+            <div id="otp-popup" class="popup hidden">
+                <div class="popup-content">
+                    <h2>Enter OTP</h2>
+                    <p>OTP Sent to <span id="otp-mobile-display"></span></p>
+                    <p class="simulated-otp">(Simulated OTP: <strong id="simulated-otp-value">123456</strong>)</p>
+                    <div class="input-group">
+                        <label for="otp">OTP:</label>
+                        <input type="text" id="otp" name="otp" placeholder="Enter 6 digit OTP" maxlength="6" inputmode="numeric">
+                    </div>
+                    <div class="button-group">
+                         <button id="login-btn" class="btn btn-success">Continue</button>
+                         <button id="close-otp-popup-btn" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Screen (Initially Hidden) -->
+    <div id="main-app-screen" class="screen hidden">
+        <header class="app-header">
+            <!-- Fake Recent Withdrawals Ticker -->
+            <div class="fake-withdrawals">
+                <div class="ticker-wrap">
+                    <div class="ticker-move">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="wallet-info container">
+                <span class="balance-label">Balance:</span>
+                <span id="user-balance" class="balance-amount">₹ 0.00</span>
+                <button id="deposit-btn-header" class="btn btn-deposit">Deposit</button>
+            </div>
+        </header>
+
+        <main class="app-main container">
+            <h2>Spin the Wheel!</h2>
+
+            <div class="wheel-container">
+                <div class="wheel-pointer">▼</div>
+                <div id="wheel" class="wheel">
+                    <!-- Segments will be created by JS/CSS if needed, or use background image -->
+                    <div class="wheel-inner">SPIN</div>
+                </div>
+            </div>
+
+            <div id="spin-result" class="spin-result-display">Ready to Spin!</div>
+
+            <button id="spin-btn" class="btn btn-spin" disabled>
+                Spin (Cost: ₹ 10)
+            </button>
+            <p class="spin-outcomes">Win ₹5 to ₹100 or Lose ₹10</p>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2023 Spin King (Simulation)</p>
+        </footer>
+    </div>
+
+    <!-- Deposit Screen (Initially Hidden) -->
+     <div id="deposit-screen" class="screen hidden">
+         <div class="container">
+            <button id="back-to-main-btn" class="btn btn-back">&lt; Back</button>
+            <h2>Add Funds</h2>
+            <div class="input-group">
+                <label for="deposit-amount">Amount (Min ₹50):</label>
+                <input type="number" id="deposit-amount" name="deposit-amount" min="50" value="50" placeholder="Enter amount" inputmode="numeric">
+            </div>
+            <p>Simulated Payment via UPI:</p>
+            <button id="pay-via-upi-btn" class="btn btn-success btn-full">Proceed to Pay ₹<span id="deposit-pay-amount">50</span> (Simulated)</button>
+            <!-- In a real app, this would show UPI options -->
+            <div class="simulated-payment-notice">
+                This is a simulation. Clicking "Proceed" will instantly add the amount to your balance for demo purposes. No real payment occurs.
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
