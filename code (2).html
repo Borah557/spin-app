@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>✨ Spin Royale ✨ (Enhanced Simulation)</title>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* --- START EMBEDDED CSS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        /* --- Variables & Basic Reset --- */
+        :root {
+            --primary-color: #6a11cb; /* Deep Purple */
+            --secondary-color: #2575fc; /* Bright Blue */
+            --accent-color: #ffc107; /* Gold/Yellow */
+            --text-color: #f0f0f0;
+            --dark-bg: #1a1a2e; /* Dark Blue/Purple Background */
+            --light-bg: #2a2a3e;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --neutral-color: #adb5bd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #16222a 100%);
+            color: var(--text-color);
+            height: 100%;
+            overscroll-behavior: none;
+            font-size: 16px; /* Base font size */
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* --- Screen Management & Transitions --- */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 20px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        .screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex; /* Use flex for icon alignment */
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between icon and text */
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px; /* More rounded */
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600; /* Bolder */
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.15s ease, box-shadow 0.3s ease;
+            margin: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
+        }
+        .btn:disabled {
+            background-color: #555 !important; /* Darker disabled */
+            color: var(--neutral-color) !important;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+        .btn i { /* Icon size */
+            font-size: 1.1em;
+        }
+
+        .btn-primary { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); color: white; }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 12px rgba(37, 117, 252, 0.4); }
+
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-success:hover:not(:disabled) { background-color: #218838; box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4); }
+
+        .btn-secondary { background-color: #4a4a5a; color: var(--text-color); }
+        .btn-secondary:hover:not(:disabled) { background-color: #5a5a6a; }
+
+        .btn-deposit { background-color: var(--accent-color); color: var(--dark-bg); }
+        .btn-deposit:hover:not(:disabled) { background-color: #e0a800; box-shadow: 0 6px 12px rgba(255, 193, 7, 0.4); }
+
+        .btn-withdraw { background-color: var(--danger-color); color: white; } /* Changed Withdraw color */
+        .btn-withdraw:hover:not(:disabled) { background-color: #c82333; box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4); }
+
+        .btn-spin {
+            background: linear-gradient(to right, #ff416c, #ff4b2b); /* Energetic gradient */
+            color: white;
+            font-size: 1.2em;
+            padding: 15px 35px;
+            border-radius: 50px;
+            box-shadow: 0 8px 15px rgba(255, 75, 43, 0.3);
+        }
+        .btn-spin:hover:not(:disabled) { box-shadow: 0 10px 20px rgba(255, 75, 43, 0.5); }
+
+        .btn-full { width: calc(100% - 10px); /* Account for margin */ margin: 10px 5px; }
+        .btn-back { background: none; border: 1px solid var(--neutral-color); color: var(--neutral-color); padding: 8px 15px; font-size: 0.9em; margin-bottom: 15px; box-shadow: none; text-transform: none; letter-spacing: 0; }
+        .btn-back:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.1); }
+
+        /* --- Forms --- */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--neutral-color);
+            font-size: 0.9em;
+        }
+        .input-group input[type="tel"],
+        .input-group input[type="text"],
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--light-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 1em;
+            color: var(--text-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
+        }
+        /* Style number input arrows (optional) */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type=number] {
+          -moz-appearance: textfield; /* Firefox */
+        }
+
+        /* --- Login Screen --- */
+        #login-screen {
+            text-align: center;
+            padding-top: 50px;
+        }
+        #login-screen h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+        #login-screen p {
+            color: var(--neutral-color);
+            margin-bottom: 30px;
+        }
+
+        /* --- OTP & Withdrawal Popups --- */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .popup:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+        .popup-content {
+            background-color: var(--light-bg);
+            padding: 30px 35px;
+            border-radius: 15px; /* More rounded */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 90%;
+            width: 380px;
+            border: 1px solid #444;
+            animation: popupScaleIn 0.3s ease-out forwards;
+        }
+        .popup:not(.hidden) .popup-content { animation: popupScaleIn 0.3s ease-out forwards; }
+        @keyframes popupScaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .popup-content h2 { margin-bottom: 15px; color: var(--accent-color); }
+        .popup-content p { margin-bottom: 10px; color: var(--neutral-color); }
+        .popup .button-group { margin-top: 25px; display: flex; justify-content: space-around; }
+        .simulated-otp { font-size: 0.9em; color: #aaa; }
+        .simulated-otp strong { color: var(--accent-color); font-weight: bold; }
+        .available-balance { font-size: 0.95em; color: var(--success-color); margin-bottom: 15px; font-weight: 600;}
+        .withdraw-notice { font-size: 0.8em; color: var(--neutral-color); margin-top: 15px;}
+
+        /* --- Main App Screen Header --- */
+        .app-header {
+            background: var(--dark-bg); /* Solid dark for contrast */
+            color: white;
+            padding-bottom: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .fake-withdrawals {
+            background-color: rgba(0, 0, 0, 0.3); /* Subtle ticker bg */
+            padding: 6px 0;
+            font-size: 0.85em;
+            overflow: hidden;
+            white-space: nowrap;
+            height: 30px; /* Slightly taller */
+            color: #ccc;
+        }
+        .ticker-wrap { display: inline-block; padding-left: 100%; animation: ticker 35s linear infinite; } /* Slower ticker */
+        .ticker-move { display: inline-block; }
+        .ticker-move span { padding: 0 25px; opacity: 0.8; }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .balances-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px;
+            text-align: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+        .balance-box {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05); /* Subtle box */
+            min-width: 120px; /* Ensure some width */
+            margin: 5px;
+        }
+        .balance-label {
+            font-size: 0.8em;
+            opacity: 0.7;
+            display: block;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .balance-amount {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--accent-color); /* Highlight amount */
+        }
+        .balance-amount.winning {
+             color: var(--success-color); /* Different color for winnings */
+        }
+        .header-actions {
+            margin-top: 10px;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* --- Main App Area --- */
+        .app-main {
+            text-align: center;
+            padding: 40px 15px; /* More padding */
+        }
+        .app-main h2 {
+             margin-bottom: 30px;
+             color: var(--text-color);
+             font-size: 1.8em;
+             font-weight: 600;
+        }
+
+        /* --- ENHANCED Spinning Wheel --- */
+        .wheel-container {
+            position: relative;
+            width: 300px; /* Slightly larger */
+            height: 300px;
+            margin: 0 auto 40px auto; /* More space below */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); /* Wheel shadow */
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px; /* Adjusted position */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 30px solid var(--accent-color); /* Pointer color */
+            z-index: 10;
+             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #fff; /* Thicker white border */
+            box-shadow: inset 0 0 0 5px var(--light-bg), 0 0 0 10px #444; /* Inner and outer rings */
+            position: relative;
+            overflow: hidden;
+            transition: transform 6s cubic-bezier(0.3, 1, 0.4, 1); /* Smoother, longer spin */
+            background: conic-gradient( /* 9 Segments, 40deg each */
+                #ffcc29 0deg 40deg,  /* 5 */
+                #f57c00 40deg 80deg,  /* 10 */
+                #d32f2f 80deg 120deg, /* 25 */
+                #7b1fa2 120deg 160deg, /* 45 */
+                #1976d2 160deg 200deg, /* 65 */
+                #303f9f 200deg 240deg, /* -10 (dark) */
+                #00796b 240deg 280deg, /* 80 */
+                #388e3c 280deg 320deg, /* 85 */
+                #afb42b 320deg 360deg  /* 100 */
+            );
+        }
+        .wheel-segment { /* Container for segment text */
+            position: absolute;
+            top: 0; left: 50%;
+            width: 50%; height: 50%;
+            transform-origin: 0 100%; /* Rotate from bottom-left (center of wheel) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-left: 35px; /* Push text outwards */
+            font-weight: 700;
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.9); /* White text, slightly transparent */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+         .wheel-segment span {
+            display: block;
+            transform: rotate(-90deg) translateY(-50%); /* Counter-rotate text */
+        }
+        /* Position each segment text (Angle = Midpoint of segment - 90deg for transform) */
+        .segment-0 { transform: rotate(20deg); } /* 5 */
+        .segment-1 { transform: rotate(60deg); } /* 10 */
+        .segment-2 { transform: rotate(100deg); } /* 25 */
+        .segment-3 { transform: rotate(140deg); } /* 45 */
+        .segment-4 { transform: rotate(180deg); } /* 65 */
+        .segment-5 { transform: rotate(220deg); color: #ffdddd;} /* -10 */
+        .segment-6 { transform: rotate(260deg); } /* 80 */
+        .segment-7 { transform: rotate(300deg); } /* 85 */
+        .segment-8 { transform: rotate(340deg); } /* 100 */
+
+        .wheel-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fff 0%, #eee 100%);
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            border: 4px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark-bg);
+            font-weight: bold;
+            font-size: 1.5em; /* Larger center text */
+        }
+        .wheel-center i { color: var(--accent-color); } /* Center icon color */
+
+
+        /* --- Spin Result & Outcomes --- */
+        .spin-result-display {
+            margin-top: 35px;
+            font-size: 1.5em; /* Larger result text */
+            font-weight: 700;
+            min-height: 40px;
+            color: var(--accent-color); /* Default yellow */
+            transition: color 0.3s ease;
+        }
+        .spin-result-display.loss { color: var(--danger-color); }
+        .spin-result-display.win { color: var(--success-color); }
+
+        .spin-cost-display { /* Show spin cost clearly */
+            font-size: 0.95em;
+            color: var(--neutral-color);
+            margin-top: 15px;
+            margin-bottom: 25px; /* Space before spin button */
+        }
+        .spin-cost-display strong { color: var(--text-color); }
+
+        /* --- Footer --- */
+        .app-footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #888;
+            border-top: 1px solid #333;
+        }
+
+        /* --- Loading Indicator --- */
+        #loading {
+             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+             background: var(--dark-bg);
+             display: flex; flex-direction: column; justify-content: center; align-items: center;
+             z-index: 9999; font-size: 1.5em; color: var(--accent-color); font-weight: bold;
+        }
+         .loader { /* Simple CSS loader */
+            border: 5px solid var(--light-bg);
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading.hidden { display: none; }
+
+         /* --- Confetti Animation --- */
+        .confetti {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; /* Don't block clicks */
+            overflow: hidden;
+            z-index: 2000; /* Above everything */
+            display: none; /* Hidden by default */
+        }
+        .confetti.active { display: block; }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: #f00; /* Placeholder, JS sets color */
+            top: -20px; /* Start above screen */
+            opacity: 0;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* --- END EMBEDDED CSS --- */
+    </style>
+</head>
+<body>
+
+    <!-- Loading Indicator -->
+    <div id="loading"><div class="loader"></div>Loading...</div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1><i class="fa-solid fa-gem"></i> Spin Royale</h1>
+            <p>Login with Mobile Number to start winning!</p>
+            <div class="input-group">
+                <label for="mobile"><i class="fa-solid fa-mobile-screen-button"></i> Mobile Number (+91)</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter 10 digit number" maxlength="10" inputmode="numeric">
+            </div>
+            <button id="send-otp-btn" class="btn btn-primary btn-full"><i class="fa-solid fa-paper-plane"></i> Send OTP</button>
+
+            <!-- OTP Popup -->
+            <div id="otp-popup" class="popup hidden">
+                <div class="popup-content">
+                    <h2><i class="fa-solid fa-shield-halved"></i> Verify OTP</h2>
+                    <p>Enter the OTP sent to <span id="otp-mobile-display"></span></p>
+                    <p class="simulated-otp">(Simulated OTP: <strong id="simulated-otp-value">123456</strong>)</p>
+                    <div class="input-group">
+                        <label for="otp"><i class="fa-solid fa-key"></i> OTP Code</label>
+                        <input type="text" id="otp" name="otp" placeholder="Enter 6 digit OTP" maxlength="6" inputmode="numeric">
+                    </div>
+                    <div class="button-group">
+                         <button id="login-btn" class="btn btn-success"><i class="fa-solid fa-check"></i> Continue</button>
+                         <button id="close-otp-popup-btn" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <footer class="app-footer" style="border-top: none; margin-top: 50px;">
+            <p>Play Responsibly. Simulation only.</p>
+        </footer>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="main-app-screen" class="screen hidden">
+        <header class="app-header">
+            <!-- Fake Ticker -->
+            <div class="fake-withdrawals">
+                <div class="ticker-wrap">
+                    <div class="ticker-move">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <!-- Balances -->
+            <div class="balances-container container">
+                 <div class="balance-box">
+                     <span class="balance-label"><i class="fa-solid fa-wallet"></i> Wallet</span>
+                     <span id="user-wallet-balance" class="balance-amount">₹ 0.00</span>
+                 </div>
+                 <div class="balance-box">
+                     <span class="balance-label"><i class="fa-solid fa-trophy"></i> Winnings</span>
+                     <span id="user-winning-balance" class="balance-amount winning">₹ 0.00</span>
+                 </div>
+            </div>
+             <!-- Header Actions -->
+            <div class="header-actions">
+                <button id="deposit-btn-header" class="btn btn-deposit"><i class="fa-solid fa-coins"></i> Deposit</button>
+                <button id="withdraw-btn-header" class="btn btn-withdraw"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw</button>
+            </div>
+        </header>
+
+        <main class="app-main container">
+            <h2><i class="fa-solid fa-bullseye"></i> Spin the Wheel of Fortune!</h2>
+
+            <!-- Wheel -->
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div id="wheel" class="wheel">
+                    <!-- Segments Text (Positioned by CSS) -->
+                    <div class="wheel-segment segment-0"><span>₹5</span></div>
+                    <div class="wheel-segment segment-1"><span>₹10</span></div>
+                    <div class="wheel-segment segment-2"><span>₹25</span></div>
+                    <div class="wheel-segment segment-3"><span>₹45</span></div>
+                    <div class="wheel-segment segment-4"><span>₹65</span></div>
+                    <div class="wheel-segment segment-5"><span>₹-10</span></div>
+                    <div class="wheel-segment segment-6"><span>₹80</span></div>
+                    <div class="wheel-segment segment-7"><span>₹85</span></div>
+                    <div class="wheel-segment segment-8"><span>₹100</span></div>
+                </div>
+                 <div class="wheel-center"><i class="fa-solid fa-star"></i></div>
+            </div>
+
+            <!-- Spin Result Display -->
+            <div id="spin-result" class="spin-result-display">Ready to Spin! ✨</div>
+
+            <!-- Spin Button & Cost -->
+             <p class="spin-cost-display">Spin Cost: <strong>₹ 10</strong> (deducted from Wallet/Winnings)</p>
+            <button id="spin-btn" class="btn btn-spin" disabled>
+                <i class="fa-solid fa-rotate"></i> Spin Now!
+            </button>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2023 Spin Royale (Simulation). For entertainment purposes only.</p>
+        </footer>
+    </div>
+
+    <!-- Deposit Screen -->
+     <div id="deposit-screen" class="screen hidden">
+         <div class="container">
+            <button id="back-to-main-btn-deposit" class="btn btn-back"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <h2 style="text-align: center; margin-bottom: 30px;"><i class="fa-solid fa-piggy-bank"></i> Add Funds to Wallet</h2>
+            <div class="input-group">
+                <label for="deposit-amount"><i class="fa-solid fa-indian-rupee-sign"></i> Amount (Min ₹50)</label>
+                <input type="number" id="deposit-amount" name="deposit-amount" min="50" value="50" placeholder="Enter amount" inputmode="numeric">
+            </div>
+            <p style="text-align:center; color: var(--neutral-color); margin-bottom: 15px;">Simulated Payment via UPI</p>
+            <button id="pay-via-upi-btn" class="btn btn-success btn-full"><i class="fa-solid fa-qrcode"></i> Proceed to Pay ₹<span id="deposit-pay-amount">50</span> (Simulated)</button>
+            <div class="simulated-payment-notice" style="margin-top: 20px; font-size: 0.9em; color: #ccc; background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; text-align: center;">
+                <i class="fa-solid fa-circle-info"></i> This is a simulation. Clicking "Proceed" will instantly add the amount to your Wallet Balance. No real payment occurs.
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Popup -->
+    <div id="withdrawal-popup" class="popup hidden">
+        <div class="popup-content">
+            <h2><i class="fa-solid fa-hand-holding-dollar"></i> Withdraw Winnings</h2>
+            <p class="available-balance">Available to Withdraw: <strong id="withdrawable-balance">₹ 0.00</strong></p>
+             <div class="input-group">
+                <label for="withdraw-amount"><i class="fa-solid fa-cash-register"></i> Amount to Withdraw</label>
+                <input type="number" id="withdraw-amount" name="withdraw-amount" min="1" placeholder="Enter amount" inputmode="numeric">
+            </div>
+             <div class="input-group">
+                <label for="withdraw-upi"><i class="fa-solid fa-qrcode"></i> UPI ID / Bank Details (Placeholder)</label>
+                <input type="text" id="withdraw-upi" name="withdraw-upi" placeholder="e.g., yourname@upi">
+            </div>
+            <div class="button-group">
+                 <button id="confirm-withdraw-btn" class="btn btn-success"><i class="fa-solid fa-check"></i> Confirm</button>
+                 <button id="close-withdraw-popup-btn" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            </div>
+             <p class="withdraw-notice"><i class="fa-solid fa-clock"></i> Withdrawals are simulated instantly.</p>
+        </div>
+    </div>
+
+     <!-- Confetti Container -->
+    <div id="confetti-container" class="confetti"></div>
+
+    <!-- Audio Elements (Provide your own MP3 files) -->
+    <audio id="spin-audio" src="spin-sound.mp3" preload="auto"></audio>
+    <audio id="win-audio" src="win-sound.mp3" preload="auto"></audio>
+
+
+    <script>
+        // --- START EMBEDDED JAVASCRIPT ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Get DOM Elements ---
+            const loadingIndicator = document.getElementById('loading');
+            const screens = {
+                login: document.getElementById('login-screen'),
+                main: document.getElementById('main-app-screen'),
+                deposit: document.getElementById('deposit-screen'),
+            };
+            const popups = {
+                otp: document.getElementById('otp-popup'),
+                withdrawal: document.getElementById('withdrawal-popup'),
+            };
+
+            // Login Elements
+            const mobileInput = document.getElementById('mobile');
+            const sendOtpBtn = document.getElementById('send-otp-btn');
+            const otpMobileDisplay = document.getElementById('otp-mobile-display');
+            const simulatedOtpValue = document.getElementById('simulated-otp-value');
+            const otpInput = document.getElementById('otp');
+            const loginBtn = document.getElementById('login-btn');
+            const closeOtpPopupBtn = document.getElementById('close-otp-popup-btn');
+
+            // Main Screen Elements
+            const walletBalanceDisplay = document.getElementById('user-wallet-balance');
+            const winningBalanceDisplay = document.getElementById('user-winning-balance');
+            const depositBtnHeader = document.getElementById('deposit-btn-header');
+            const withdrawBtnHeader = document.getElementById('withdraw-btn-header');
+            const spinBtn = document.getElementById('spin-btn');
+            const wheel = document.getElementById('wheel');
+            const spinResultDisplay = document.getElementById('spin-result');
+            const fakeWithdrawalsTicker = document.querySelector('.ticker-move');
+
+            // Deposit Screen Elements
+            const backToMainBtnDeposit = document.getElementById('back-to-main-btn-deposit');
+            const depositAmountInput = document.getElementById('deposit-amount');
+            const depositPayAmount = document.getElementById('deposit-pay-amount');
+            const payViaUpiBtn = document.getElementById('pay-via-upi-btn');
+
+            // Withdrawal Popup Elements
+            const withdrawableBalanceDisplay = document.getElementById('withdrawable-balance');
+            const withdrawAmountInput = document.getElementById('withdraw-amount');
+            const withdrawUpiInput = document.getElementById('withdraw-upi');
+            const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
+            const closeWithdrawPopupBtn = document.getElementById('close-withdraw-popup-btn');
+
+             // Audio Elements
+            const spinAudio = document.getElementById('spin-audio');
+            const winAudio = document.getElementById('win-audio');
+
+            // Confetti
+            const confettiContainer = document.getElementById('confetti-container');
+
+
+            // --- App State ---
+            let walletBalance = 0;
+            let winningBalance = 0;
+            let isSpinning = false;
+            const SPIN_COST = 10;
+            const JOINING_BONUS = 50;
+            const MIN_DEPOSIT = 50;
+            const MIN_WITHDRAWAL = 50; // Example minimum withdrawal
+            let currentWheelRotation = 0; // Track wheel rotation for animation
+
+            // Define the wheel outcomes IN ORDER corresponding to CSS segments
+            const wheelOutcomes = [5, 10, 25, 45, 65, -10, 80, 85, 100];
+            const segmentAngle = 360 / wheelOutcomes.length; // 40 degrees
+
+            // --- Functions ---
+
+            // Update balance displays
+            function updateBalanceDisplay() {
+                walletBalanceDisplay.textContent = `₹ ${walletBalance.toFixed(2)}`;
+                winningBalanceDisplay.textContent = `₹ ${winningBalance.toFixed(2)}`;
+                checkSpinAvailability(); // Check if spin button should be enabled
+            }
+
+            // Check if user can afford to spin
+             function checkSpinAvailability() {
+                const totalBalance = walletBalance + winningBalance;
+                spinBtn.disabled = totalBalance < SPIN_COST || isSpinning;
+            }
+
+            // Navigate between screens
+            function showScreen(screenKey) {
+                Object.values(screens).forEach(screen => screen.classList.remove('active'));
+                screens[screenKey].classList.add('active');
+            }
+
+            // Show/Hide Popups
+            function showPopup(popupKey, show = true) {
+                const popupElement = popups[popupKey];
+                if (show) {
+                    popupElement.classList.remove('hidden');
+                } else {
+                    popupElement.classList.add('hidden');
+                }
+            }
+
+             // Play Sound Helper
+            function playSound(audioElement) {
+                audioElement.currentTime = 0; // Rewind to start
+                audioElement.play().catch(error => console.log("Audio play failed:", error)); // Play and catch errors
+            }
+
+            // Simulate OTP Send
+            function handleSendOtp() {
+                const mobileNumber = mobileInput.value.trim();
+                if (mobileNumber.length === 10 && /^\d+$/.test(mobileNumber)) {
+                    otpMobileDisplay.textContent = `+91 ${mobileNumber}`;
+                    simulatedOtpValue.textContent = Math.floor(100000 + Math.random() * 900000);
+                    otpInput.value = '';
+                    showPopup('otp', true);
+                } else {
+                    alert('⚠️ Please enter a valid 10-digit mobile number.');
+                }
+            }
+
+            // Simulate Login
+            function handleLogin() {
+                const enteredOtp = otpInput.value.trim();
+                if (enteredOtp.length === 6 && /^\d+$/.test(enteredOtp)) {
+                    walletBalance = JOINING_BONUS; // Bonus goes to Wallet Balance
+                    winningBalance = 0; // Reset winnings on new login/session
+                    updateBalanceDisplay();
+                    showScreen('main');
+                    showPopup('otp', false);
+                    startFakeWithdrawals(); // Start ticker only after login
+                } else {
+                    alert('🚫 Invalid OTP entered. Please enter the 6-digit code.');
+                }
+            }
+
+             // Handle Spin Action
+            function handleSpin() {
+                const totalBalance = walletBalance + winningBalance;
+                if (isSpinning || totalBalance < SPIN_COST) {
+                    alert('Insufficient balance to spin! 😥');
+                    return;
+                }
+
+                isSpinning = true;
+                spinBtn.disabled = true;
+                spinResultDisplay.textContent = "Spinning... 🤞";
+                spinResultDisplay.className = 'spin-result-display'; // Reset color class
+                playSound(spinAudio); // Play spin sound
+
+                // Deduct Spin Cost (Wallet first, then Winnings if needed)
+                let costDeducted = SPIN_COST;
+                if (walletBalance >= costDeducted) {
+                    walletBalance -= costDeducted;
+                } else {
+                    costDeducted -= walletBalance;
+                    walletBalance = 0;
+                    winningBalance -= costDeducted; // Deduct remaining from winnings
+                }
+                updateBalanceDisplay(); // Show balance deduction immediately
+
+                // Determine the winning segment index
+                const winningIndex = Math.floor(Math.random() * wheelOutcomes.length);
+                const resultAmount = wheelOutcomes[winningIndex];
+
+                // Calculate visual rotation for the wheel
+                // Target angle = middle of the winning segment + multiple full rotations
+                const targetSegmentCenter = (winningIndex * segmentAngle) + (segmentAngle / 2);
+                // Adjust so pointer points correctly (pointer is at the top, 0deg is right)
+                const pointerOffset = 90; // Pointer is at 270deg or -90deg
+                const rotationAdjustment = 360 - targetSegmentCenter + pointerOffset;
+
+                const extraRotations = 360 * (5 + Math.floor(Math.random() * 3)); // 5-7 full spins
+                const targetRotation = currentWheelRotation + extraRotations + rotationAdjustment;
+
+                wheel.style.transition = 'transform 6s cubic-bezier(0.3, 1, 0.4, 1)';
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
+                currentWheelRotation = targetRotation; // Store for next spin if needed (optional)
+
+                // After animation finishes
+                setTimeout(() => {
+                    if (resultAmount === -10) {
+                        // Loss: Deduct from Winnings first, then Wallet
+                        let lossAmount = 10;
+                        if (winningBalance >= lossAmount) {
+                             winningBalance -= lossAmount;
+                        } else {
+                            lossAmount -= winningBalance;
+                            winningBalance = 0;
+                            walletBalance -= lossAmount; // Deduct remaining from wallet
+                            if(walletBalance < 0) walletBalance = 0; // Ensure wallet doesn't go negative
+                        }
+                        spinResultDisplay.textContent = `Oh no! Lost ₹10 😥`;
+                        spinResultDisplay.classList.add('loss');
+                    } else if (resultAmount > 0) {
+                        // Win: Add to Winning Balance
+                        winningBalance += resultAmount;
+                        spinResultDisplay.textContent = `🎉 You won ₹${resultAmount}! 🎉`;
+                        spinResultDisplay.classList.add('win');
+                        playSound(winAudio); // Play win sound
+                        triggerConfetti(); // Show confetti
+                    }
+                     // No else needed, 0 is not an outcome here
+
+                    updateBalanceDisplay(); // Update balances with final result
+                    isSpinning = false;
+                    checkSpinAvailability(); // Check if can spin again
+
+                }, 6100); // Match timeout to CSS transition duration + buffer
+            }
+
+            // Handle Deposit Flow
+            function showDepositScreen() {
+                depositAmountInput.value = MIN_DEPOSIT;
+                depositPayAmount.textContent = MIN_DEPOSIT;
+                showScreen('deposit');
+            }
+
+            function handleDepositAmountChange() {
+                let amount = parseInt(depositAmountInput.value) || MIN_DEPOSIT;
+                if (amount < MIN_DEPOSIT) {
+                    amount = MIN_DEPOSIT;
+                    depositAmountInput.value = MIN_DEPOSIT;
+                }
+                depositPayAmount.textContent = amount;
+            }
+
+            function handleSimulatedPayment() {
+                let amount = parseInt(depositAmountInput.value);
+                 if (isNaN(amount) || amount < MIN_DEPOSIT) {
+                    alert(`⚠️ Minimum deposit amount is ₹${MIN_DEPOSIT}`);
+                    depositAmountInput.value = MIN_DEPOSIT;
+                    depositPayAmount.textContent = MIN_DEPOSIT;
+                    return;
+                }
+
+                walletBalance += amount; // Add deposit to Wallet Balance
+                updateBalanceDisplay();
+                alert(`✅ Successfully added ₹${amount.toFixed(2)} to your Wallet Balance (Simulation).`);
+                showScreen('main');
+            }
+
+             // Handle Withdrawal Flow
+            function showWithdrawalPopup() {
+                withdrawableBalanceDisplay.textContent = `₹ ${winningBalance.toFixed(2)}`;
+                withdrawAmountInput.value = ''; // Clear previous amount
+                withdrawUpiInput.value = ''; // Clear previous details
+                withdrawAmountInput.max = winningBalance; // Set max attribute dynamically
+                showPopup('withdrawal', true);
+            }
+
+             function handleConfirmWithdrawal() {
+                const amountToWithdraw = parseFloat(withdrawAmountInput.value);
+                const upiDetails = withdrawUpiInput.value.trim();
+
+                if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
+                    alert('⚠️ Please enter a valid withdrawal amount.');
+                    return;
+                }
+                 if (amountToWithdraw < MIN_WITHDRAWAL) {
+                     alert(`⚠️ Minimum withdrawal amount is ₹ ${MIN_WITHDRAWAL.toFixed(2)}.`);
+                    return;
+                 }
+                if (amountToWithdraw > winningBalance) {
+                    alert('🚫 Withdrawal amount exceeds your Winning Balance.');
+                    return;
+                }
+                if (upiDetails === '') {
+                    alert('⚠️ Please enter your UPI ID or Bank Details.');
+                    return;
+                }
+
+                // Simulate successful withdrawal
+                winningBalance -= amountToWithdraw;
+                updateBalanceDisplay();
+                alert(`✅ Withdrawal of ₹${amountToWithdraw.toFixed(2)} to ${upiDetails} initiated (Simulation).`);
+                showPopup('withdrawal', false);
+            }
+
+
+            // Fake Withdrawal Ticker
+            function generateFakeWithdrawal() {
+                const names = ["Raj**", "Poo**", "Ami**", "Sne**", "Vik**", "Dee**", "Man**", "Pri**", "Aka**", "Sun**"];
+                const amounts = [60, 125, 85, 255, 90, 155, 115, 310, 75, 185];
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+                // Add emojis to ticker items
+                const icons = ["💰", "💸", "✅", "🏆"];
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                return `<span>${randomIcon} ${randomName} withdrew ₹${randomAmount}</span>`;
+            }
+
+            function startFakeWithdrawals() {
+                let items = '';
+                for (let i = 0; i < 25; i++) { // More items for smoother loop
+                    items += generateFakeWithdrawal();
+                }
+                fakeWithdrawalsTicker.innerHTML = items;
+            }
+
+            // Confetti Trigger
+             function triggerConfetti() {
+                confettiContainer.innerHTML = ''; // Clear previous confetti
+                confettiContainer.classList.add('active');
+
+                const colors = ['#ffcc29', '#f57c00', '#d32f2f', '#7b1fa2', '#1976d2', '#00796b', '#388e3c'];
+                for (let i = 0; i < 100; i++) { // Create 100 pieces
+                    const piece = document.createElement('div');
+                    piece.classList.add('confetti-piece');
+                    piece.style.left = Math.random() * 100 + 'vw';
+                    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.animationDelay = Math.random() * 2 + 's'; // Random delay
+                    piece.style.width = (Math.random() * 5 + 5) + 'px'; // Random size
+                    piece.style.height = piece.style.width;
+                    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    confettiContainer.appendChild(piece);
+                }
+
+                // Remove confetti container after animation (approx 3s + 2s delay max)
+                setTimeout(() => {
+                     confettiContainer.classList.remove('active');
+                     confettiContainer.innerHTML = '';
+                }, 5000);
+            }
+
+            // --- Event Listeners ---
+            // Login
+            sendOtpBtn.addEventListener('click', handleSendOtp);
+            closeOtpPopupBtn.addEventListener('click', () => showPopup('otp', false));
+            loginBtn.addEventListener('click', handleLogin);
+            // Main Screen
+            spinBtn.addEventListener('click', handleSpin);
+            depositBtnHeader.addEventListener('click', showDepositScreen);
+            withdrawBtnHeader.addEventListener('click', showWithdrawalPopup);
+            // Deposit Screen
+            backToMainBtnDeposit.addEventListener('click', () => showScreen('main'));
+            depositAmountInput.addEventListener('input', handleDepositAmountChange);
+            payViaUpiBtn.addEventListener('click', handleSimulatedPayment);
+            // Withdrawal Popup
+             confirmWithdrawBtn.addEventListener('click', handleConfirmWithdrawal);
+             closeWithdrawPopupBtn.addEventListener('click', () => showPopup('withdrawal', false));
+
+
+            // --- Initialization ---
+            updateBalanceDisplay(); // Initialize display
+            showScreen('login'); // Start on login screen
+            loadingIndicator.classList.add('hidden'); // Hide loading after setup
+
+        });
+
+        // --- END EMBEDDED JAVASCRIPT ---
+    </script>
+
+</body>
+</html>
