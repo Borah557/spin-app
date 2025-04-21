@@ -1,0 +1,292 @@
+/* --- Basic Reset & Setup --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f7f6; /* Light background */
+    color: #333;
+    height: 100%;
+    overscroll-behavior: none; /* Prevent pull-to-refresh */
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* --- Screen Management --- */
+.screen {
+    display: none; /* Hidden by default */
+    min-height: 100vh; /* Full height */
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.screen.active {
+    display: block; /* Show active screen */
+}
+
+/* --- Buttons --- */
+.btn {
+    display: inline-block;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px; /* Rounded buttons */
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin: 5px;
+}
+.btn:active {
+    transform: scale(0.98);
+}
+.btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover:not(:disabled) { background-color: #0056b3; }
+
+.btn-success { background-color: #28a745; color: white; }
+.btn-success:hover:not(:disabled) { background-color: #1e7e34; }
+
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover:not(:disabled) { background-color: #545b62; }
+
+.btn-deposit { background-color: #ffc107; color: #333; }
+.btn-deposit:hover:not(:disabled) { background-color: #e0a800; }
+
+.btn-spin { background-color: #dc3545; color: white; font-size: 1.2em; padding: 15px 35px; }
+.btn-spin:hover:not(:disabled) { background-color: #c82333; }
+
+.btn-full { width: 100%; margin-top: 15px; }
+.btn-back { background: none; border: 1px solid #ccc; color: #555; padding: 5px 10px; font-size: 0.9em; margin-bottom: 15px; }
+
+/* --- Forms --- */
+.input-group {
+    margin-bottom: 20px;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.input-group input[type="tel"],
+.input-group input[type="text"],
+.input-group input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+}
+.input-group input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* --- Login Screen --- */
+#login-screen {
+    text-align: center;
+    padding-top: 50px;
+}
+#login-screen h1 {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+/* --- OTP Popup --- */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+.popup:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+}
+.popup-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    max-width: 90%;
+    width: 350px;
+}
+.popup-content h2 { margin-bottom: 15px; }
+.popup-content p { margin-bottom: 10px; }
+.popup .button-group { margin-top: 20px; }
+.simulated-otp { font-size: 0.9em; color: #666; }
+.simulated-otp strong { color: #dc3545; }
+
+/* --- Main App Screen --- */
+.app-header {
+    background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%); /* Vibrant gradient */
+    color: white;
+    padding-bottom: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.fake-withdrawals {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 5px 0;
+    font-size: 0.85em;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 25px; /* Fixed height */
+}
+/* Ticker Animation */
+.ticker-wrap { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+.ticker-move { display: inline-block; }
+.ticker-move span { padding: 0 20px; }
+@keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+.wallet-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+.balance-label { font-size: 0.9em; opacity: 0.8; }
+.balance-amount { font-size: 1.4em; font-weight: bold; }
+
+.app-main {
+    text-align: center;
+    padding: 30px 15px;
+}
+.app-main h2 { margin-bottom: 30px; color: #333; }
+
+/* --- Spinning Wheel --- */
+.wheel-container {
+    position: relative;
+    width: 280px; /* Adjust size */
+    height: 280px;
+    margin: 0 auto 30px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wheel-pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #e74c3c; /* Pointer color */
+    z-index: 10;
+}
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient( /* Example segments - replace with image or more complex CSS/JS */
+        #3498db 0deg 45deg, #f1c40f 45deg 90deg,
+        #e74c3c 90deg 135deg, #9b59b6 135deg 180deg,
+        #2ecc71 180deg 225deg, #1abc9c 225deg 270deg,
+        #e67e22 270deg 315deg, #bdc3c7 315deg 360deg
+    );
+    border: 5px solid #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1); /* Spin animation */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wheel-inner {
+    width: 80px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #333;
+    z-index: 5;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    border: 3px solid #eee;
+}
+
+/* Spin Animation Class */
+.wheel.spinning {
+    /* JS will handle the specific rotation */
+}
+
+.spin-result-display {
+    margin-top: 25px;
+    font-size: 1.3em;
+    font-weight: bold;
+    min-height: 30px;
+    color: #28a745; /* Default to success color */
+}
+.spin-result-display.loss {
+    color: #dc3545; /* Red for loss */
+}
+
+.spin-outcomes {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* --- Deposit Screen --- */
+#deposit-screen {
+    padding-top: 30px;
+}
+#deposit-screen h2 { margin-bottom: 25px; text-align: center; }
+.simulated-payment-notice {
+    margin-top: 20px;
+    font-size: 0.85em;
+    color: #555;
+    background-color: #fff3cd;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ffeeba;
+    text-align: center;
+}
+
+/* --- Footer --- */
+.app-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    font-size: 0.8em;
+    color: #aaa;
+}
+
+/* --- Loading Indicator --- */
+#loading.hidden {
+    display: none;
+}
